@@ -2,14 +2,14 @@ use derive_builder::Builder;
 use std::process::{Command, Output};
 use std::str::from_utf8;
 
-const CRATE_PATH: &str = env!("CARGO_MANIFEST_DIR");
-
 #[derive(Builder)]
 pub struct LitTester {
     #[builder(setter(into))]
     cmd: String,
     #[builder(default = "vec![]")]
     args: Vec<String>,
+    #[builder(setter(into))]
+    current_dir: String,
     #[builder(default = "vec![]")]
     checks: Vec<String>,
 }
@@ -48,7 +48,7 @@ fn rec_check_output(checks: &[String], stdout: &str, errs: &mut Vec<String>) {
 impl LitTester {
     fn run_command(&self) -> Result<Output, LitError> {
         let res = Command::new(&self.cmd)
-            .current_dir(CRATE_PATH)
+            .current_dir(&self.current_dir)
             .args(&self.args)
             .output();
 
@@ -107,11 +107,14 @@ impl LitTester {
 mod test {
     use super::*;
 
+    const CRATE_PATH: &str = env!("CARGO_MANIFEST_DIR");
+
     #[test]
     fn run_command_success() -> Result<(), LitError> {
         let lt = LitTester {
             cmd: "cargo".into(),
             args: vec!["help".into()],
+            current_dir: CRATE_PATH.into(),
             checks: Vec::new(),
         };
 
@@ -126,6 +129,7 @@ mod test {
         let lt = LitTester {
             cmd: "cargo".into(),
             args: vec!["holp".into()],
+            current_dir: CRATE_PATH.into(),
             checks: Vec::new(),
         };
 
@@ -140,6 +144,7 @@ mod test {
         let lt = LitTester {
             cmd: "command_does_not_exist".into(),
             args: vec![],
+            current_dir: CRATE_PATH.into(),
             checks: Vec::new(),
         };
 
@@ -161,6 +166,7 @@ mod test {
         LitTester {
             cmd: "".into(),
             args: vec![],
+            current_dir: CRATE_PATH.into(),
             checks: vec![],
         }
     }
@@ -194,6 +200,7 @@ mod test {
         LitTester {
             cmd: "cargo".into(),
             args: vec!["help".into()],
+            current_dir: CRATE_PATH.into(),
             checks: vec![],
         }
         .run_test()
@@ -204,6 +211,7 @@ mod test {
         LitTester {
             cmd: "cargo".into(),
             args: vec!["holp".into()],
+            current_dir: CRATE_PATH.into(),
             checks: vec![],
         }
         .run_test()
@@ -215,6 +223,7 @@ mod test {
         LitTester {
             cmd: "cargo".into(),
             args: vec!["help".into()],
+            current_dir: CRATE_PATH.into(),
             checks: vec![],
         }
         .test();
@@ -226,6 +235,7 @@ mod test {
         LitTester {
             cmd: "cargo".into(),
             args: vec!["holp".into()],
+            current_dir: CRATE_PATH.into(),
             checks: vec![],
         }
         .test();
@@ -269,6 +279,7 @@ mod test {
         let lt = LitTester {
             cmd: "".into(),
             args: vec![],
+            current_dir: CRATE_PATH.into(),
             checks: vec![],
         };
 
@@ -280,6 +291,7 @@ mod test {
         let lt = LitTester {
             cmd: "".into(),
             args: vec![],
+            current_dir: CRATE_PATH.into(),
             checks: vec!["the".into()],
         };
 
@@ -294,6 +306,7 @@ mod test {
         let lt = LitTester {
             cmd: "".into(),
             args: vec![],
+            current_dir: CRATE_PATH.into(),
             checks: vec!["lo".into()],
         };
 
@@ -305,6 +318,7 @@ mod test {
         let lt = LitTester {
             cmd: "".into(),
             args: vec![],
+            current_dir: CRATE_PATH.into(),
             checks: vec!["lo".into(), "orl".into()],
         };
 
@@ -316,6 +330,7 @@ mod test {
         let lt = LitTester {
             cmd: "".into(),
             args: vec![],
+            current_dir: CRATE_PATH.into(),
             checks: vec!["lo".into(), " wo".into()],
         };
 
@@ -327,6 +342,7 @@ mod test {
         let lt = LitTester {
             cmd: "".into(),
             args: vec![],
+            current_dir: CRATE_PATH.into(),
             checks: vec!["wo".into(), "lo".into()],
         };
 
@@ -341,6 +357,7 @@ mod test {
         let lt = LitTester {
             cmd: "".into(),
             args: vec![],
+            current_dir: CRATE_PATH.into(),
             checks: vec!["al".into(), "lo".into()],
         };
 
@@ -355,6 +372,7 @@ mod test {
         let lt = LitTester {
             cmd: "".into(),
             args: vec![],
+            current_dir: CRATE_PATH.into(),
             checks: vec!["el".into(), "el".into(), "lo".into()],
         };
 
@@ -368,6 +386,7 @@ mod test {
     fn builder_pattern() {
         let lt = LitTest::default()
             .cmd("cargo")
+            .current_dir(CRATE_PATH)
             .build()
             .expect("LitTestBuilder failed");
         assert_eq!("cargo", lt.cmd);
