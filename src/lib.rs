@@ -2,15 +2,15 @@
 //! It emulates LLVM's [LIT](https://www.llvm.org/docs/CommandGuide/lit.html)
 //! and [FileCheck](https://www.llvm.org/docs/CommandGuide/FileCheck.html)
 //! testing tools.
-//! 
+//!
 //! # Example
-//! 
+//!
 //! Checks the output of `cargo help` for the strings `USAGE:` and `OPTIONS:`
 //! (in that order).
 //!
 //! ```
 //! use rlit::LitTest;
-//! 
+//!
 //! const CRATE_PATH: &str = env!("CARGO_MANIFEST_DIR");
 //!
 //! LitTest::default()
@@ -22,13 +22,13 @@
 //!         "OPTIONS:".into()])
 //!     .test();
 //! ```
-//! 
+//!
 //! The same as above, but with wrong different order of checks and,
 //! hence, the test fails:
-//! 
+//!
 //! ```should_panic
 //! use rlit::LitTest;
-//! 
+//!
 //! const CRATE_PATH: &str = env!("CARGO_MANIFEST_DIR");
 //!
 //! LitTest::default()
@@ -40,7 +40,7 @@
 //!         "USAGE:".into()])
 //!     .test();
 //! ```
-//! 
+//!
 //! Output:
 //! ```text
 //! Lit test failed with:
